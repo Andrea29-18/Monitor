@@ -1,37 +1,33 @@
 package com.example.monitor.earthquakes;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.monitor.api.ApiClient;
-import com.example.monitor.api.EarthquakeJSONResponse;
-import com.example.monitor.api.Feature;
+import com.example.monitor.Earthquake;
+import com.example.monitor.database.EqDatabase;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+public class MainViewModel  extends AndroidViewModel {
 
-public class MainViewModel  extends ViewModel {
+    private final MainRepository repository;
 
-    private final MutableLiveData<List<Earthquake>> eqList = new MutableLiveData<>();
-
-    public LiveData<List<Earthquake>> getEqList(){
-        return eqList;
+    public MainViewModel(@NonNull Application application) {
+        super(application);
+        EqDatabase database = EqDatabase.getDatabase(application);
+        repository = new MainRepository(database);
     }
 
-    private MainRepository repository = new MainRepository();
-    public void getEarthquakes(){
-        repository.getEarthquakes(earthquakeList -> {
-            eqList.setValue(earthquakeList);
-        });
+    public LiveData<List<Earthquake>> getEqList() {
+        return repository.getEqList();
+    }
+    public void downloadEarthquakes() {
+        repository.downloadAndSaveEarthquakes();
     }
 
 }
